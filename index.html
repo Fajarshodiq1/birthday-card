@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perjalanan Ulang Tahun 3D</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      #container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      #birthday-scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        opacity: 0;
+        transform: perspective(1000px) rotateY(90deg);
+        transition: all 1s ease;
+        pointer-events: none;
+      }
+      .slide.active {
+        opacity: 1;
+        transform: perspective(1000px) rotateY(0deg);
+        pointer-events: auto;
+      }
+      .slide-content {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 600px;
+        backdrop-filter: blur(10px);
+      }
+      .btn {
+        background-color: #6b46c1;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 30px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+      }
+      .btn:hover {
+        background-color: #553c9a;
+        transform: scale(1.05);
+      }
+      .photo-gallery {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .photo-gallery img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+      }
+      .photo-gallery img:hover {
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="birthday-scene"></div>
+
+      <div id="slides-container">
+        <div class="slide" id="slide1">
+          <div class="slide-content">
+            <h1>Are You Ready?</h1>
+            <p>Perjalanan keajaiban dimulai hari ini</p>
+            <button class="btn next-slide">Mulai Petualangan</button>
+          </div>
+        </div>
+
+        <div class="slide" id="slide2">
+          <div class="slide-content">
+            <h2>Hallo Sayang</h2>
+            <p>Selamat Ulang Tahun 🥳🥳 sayang  Maafin sblm nya karena telat ngucapin :)</p></p>
+            <button class="btn next-slide">Lanjutkan</button>
+          </div>
+        </div>
+
+        <div class="slide" id="slide3">
+          <div class="slide-content">
+            <h2>Momen Bersamamu 😋</h2>
+            <div class="photo-gallery">
+              <img src="gambar1.jpg" alt="Foto Kenangan 1" />
+              <img src="gambar2.jpg" alt="Foto Kenangan 2" />
+              <img src="gambar3.jpg" alt="Foto Kenangan 3" />
+            </div>
+            <button class="btn next-slide">Teruskan</button>
+          </div>
+        </div>
+
+        <div class="slide" id="slide4">
+          <div class="slide-content">
+            <h2>Bahagia Selalu ya sayang</h2>
+            <p>Bahagia terus ya sayang pasti akan ada tahun baru yang lebih baik.</p>
+            <button class="btn next-slide">Selanjutnya</button>
+          </div>
+        </div>
+
+        <div class="slide" id="slide5">
+          <div class="slide-content">
+            <h1>Selamat Jadi Sayangkuu!</h1>
+            <p>Maap banget aku lupa hukum aku yaa😣</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Three.js Scene Setup
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document
+        .getElementById("birthday-scene")
+        .appendChild(renderer.domElement);
+      camera.position.z = 5;
+
+      // Balon 3D
+      function createBalloon() {
+        const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const material = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+          transparent: true,
+          opacity: 0.7,
+        });
+        const balloon = new THREE.Mesh(geometry, material);
+
+        // Posisi acak
+        balloon.position.set(
+          (Math.random() - 0.5) * 20,
+          (Math.random() - 0.5) * 20,
+          (Math.random() - 0.5) * 20
+        );
+
+        return balloon;
+      }
+
+      // Tambahkan beberapa balon
+      const balloons = [];
+      for (let i = 0; i < 50; i++) {
+        const balloon = createBalloon();
+        scene.add(balloon);
+        balloons.push(balloon);
+      }
+
+      // Animation Loop
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Animasi balon
+        balloons.forEach((balloon) => {
+          balloon.position.y += 0.01;
+
+          // Reset posisi jika balon keluar dari view
+          if (balloon.position.y > 10) {
+            balloon.position.y = -10;
+          }
+        });
+
+        // Sedikit rotasi scene
+        scene.rotation.y += 0.001;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Slide Management
+      const slides = document.querySelectorAll(".slide");
+      let currentSlide = 0;
+
+      function showSlide(index) {
+        slides.forEach((slide, i) => {
+          if (i === index) {
+            slide.classList.add("active");
+          } else {
+            slide.classList.remove("active");
+          }
+        });
+      }
+
+      // Initial slide
+      showSlide(0);
+
+      // Event Listeners
+      document.querySelectorAll(".next-slide").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currentSlide++;
+          if (currentSlide < slides.length) {
+            showSlide(currentSlide);
+          }
+        });
+      });
+
+      document.querySelector(".reset-slides").addEventListener("click", () => {
+        currentSlide = 0;
+        showSlide(currentSlide);
+      });
+
+      // Responsive Handling
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
